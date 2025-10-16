@@ -4,7 +4,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Gerador de Recibo - REI DO ACM</title>
+  <title>Gerador de Recibo</title>
+
+  <!-- ✅ Caminho direto (sem subpastas) -->
+  <link rel="icon" type="image/png" href="favicon.png">
+
   <style>
     :root {
       --accent: #f07f1a;
@@ -152,7 +156,6 @@
       width: auto;
     }
 
-
     .bold {
       font-weight: 700;
     }
@@ -161,13 +164,10 @@
       margin: 20px 0;
     }
 
-    /* Aumenta a distância vertical da assinatura */
     p:last-of-type {
       margin-top: 60px;
-      /* antes era 20px */
     }
 
-    /* Deixa o footer mais próximo do fim */
     footer.note {
       position: absolute;
       bottom: 20px;
@@ -177,7 +177,6 @@
       font-size: 12px;
       color: #777;
     }
-
 
     @media print {
 
@@ -247,10 +246,12 @@
 
       <!-- PREVIEW -->
       <div class="preview">
+        <!-- ✅ Caminho direto -->
         <img src="marca-dagua.png" alt="marca d'água" class="watermark" id="watermarkImg">
 
         <div class="contract" id="receiptPreview">
           <div class="header">
+            <!-- ✅ Caminho direto -->
             <img src="logo-rda.png" alt="Logo RDA" id="logoImg">
             <div class="info" id="headerInfo">
               <strong>SOUZA E CAVALCANTE ACM E VIDRO LTDA</strong><br>
