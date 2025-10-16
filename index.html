@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gerador de Recibo - REI DO ACM</title>
+  <style>
+    :root {
+      --accent: #f07f1a;
+      --muted: #999;
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f8;
+      color: #111;
+    }
+
+    .app {
+      max-width: 980px;
+      margin: 20px auto;
+      padding: 18px;
+    }
+
+    .topButtons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #666;
+    }
+
+    .layout {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    form.panel {
+      width: 340px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .preview {
+      flex: 1;
+      position: relative;
+      background: #fff;
+      padding: 18px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+      overflow: hidden;
+    }
+
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.07;
+      width: 520px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .contract {
+      position: relative;
+      z-index: 1;
+      padding: 22px;
+      border: 1px solid #e6e6e6;
+      min-height: 520px;
+      font-size: 15px;
+      line-height: 2.1;
+      color: #111;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+
+    .header img {
+      height: 56px;
+    }
+
+    .header .info {
+      text-align: right;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    h1.title {
+      text-align: center;
+      text-decoration: underline;
+      margin: 6px 0 12px;
+      font-size: 22px;
+    }
+
+    .line {
+      display: inline-block;
+      border-bottom: 1px solid transparent;
+      height: 22px;
+      vertical-align: middle;
+      margin: 0 4px;
+      padding: 0 2px;
+      white-space: nowrap;
+      transition: all .2s ease;
+    }
+
+    .line.filled {
+      border-bottom-color: var(--muted);
+      background: #fafafa;
+      border-radius: 3px;
+      padding: 0 4px;
+      width: auto;
+    }
+
+
+    .bold {
+      font-weight: 700;
+    }
+
+    p {
+      margin: 20px 0;
+    }
+
+    /* Aumenta a distância vertical da assinatura */
+    p:last-of-type {
+      margin-top: 60px;
+      /* antes era 20px */
+    }
+
+    /* Deixa o footer mais próximo do fim */
+    footer.note {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+    }
+
+
+    @media print {
+
+      form.panel,
+      .topButtons {
+        display: none;
+      }
+
+      .preview {
+        box-shadow: none;
+        border: none;
+        background: white;
+      }
+
+      .watermark {
+        opacity: 0.09;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="topButtons">
+      <div style="font-size:13px;color:#666">&nbsp;</div>
+      <div>
+        <button id="btnPrint">Exportar / Salvar PDF</button>
+        <button id="btnReset" class="secondary">Limpar formulário</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- FORM -->
+      <form class="panel" id="form">
+        <h2 style="margin:0 0 10px">Dados do Recibo</h2>
+
+        <label>Loja</label>
+        <select id="store">
+          <option value="rioverde">Rio Verde - GO</option>
+          <option value="quirinopolis">Quirinópolis - GO</option>
+        </select>
+
+        <label>N.º do Recibo</label>
+        <input type="text" id="receiptNumber" placeholder="Ex: 001/2025">
+
+        <label>Valor (R$)</label>
+        <input type="number" id="receiptValue" step="0.01" placeholder="11000.00">
+
+        <label>Recebi(emos) de</label>
+        <input type="text" id="payerName" placeholder="Nome do pagador">
+
+        <label>Importância por extenso</label>
+        <input type="text" id="valueInWords" placeholder="Onze mil reais">
+
+        <label>Referente a</label>
+        <input type="text" id="reference" placeholder="Descrição do serviço ou produto">
+
+        <label>Cidade</label>
+        <input type="text" id="city" value="Rio Verde - GO">
+
+        <label>Data (manual)</label>
+        <input type="text" id="dateText" placeholder="Ex: 16 de outubro de 2025">
+
+        <label>Assinatura</label>
+        <input type="text" id="signature" placeholder="Assinatura">
+      </form>
+
+      <!-- PREVIEW -->
+      <div class="preview">
+        <img src="marca-dagua.png" alt="marca d'água" class="watermark" id="watermarkImg">
+
+        <div class="contract" id="receiptPreview">
+          <div class="header">
+            <img src="logo-rda.png" alt="Logo RDA" id="logoImg">
+            <div class="info" id="headerInfo">
+              <strong>SOUZA E CAVALCANTE ACM E VIDRO LTDA</strong><br>
+              CNPJ: 62.252.910/0001-19<br>
+              Rio Verde - GO<br>
+            </div>
+          </div>
+
+          <h1 class="title">RECIBO</h1>
+
+          <div style="display:flex;justify-content:space-between;">
+            <div><span class="bold">N.º</span> <span id="previewNumber">---</span></div>
+            <div><span class="bold">VALOR:</span> R$ <span id="previewValue">0,00</span></div>
+          </div>
+
+          <p>
+            Recebi(emos) de <span class="line" id="previewPayer"></span>,<br>
+            a importância de <span class="line" id="previewValueWords"></span>,<br>
+            referente a <span class="line" id="previewReference"></span>,<br>
+            e para clareza firmo(amos) o presente na cidade de <span class="line" id="previewCity"></span>,<br>
+            no dia <span class="line" id="previewDateText"></span>.
+          </p>
+
+          <p>
+            <span class="bold">Assinatura</span> <span class="line" id="previewSignature"></span>.
+          </p>
+
+          <footer class="note" id="footerNote">
+            © 2025 REI do ACM. Todos os direitos reservados.
+          </footer>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    const storeData = {
+      rioverde: {
+        name: "Rio Verde - GO",
+        cnpj: "62.252.910/0001-19",
+        email: "(64)99243-9047 • reidoacmrv@gmail.com"
+      },
+      quirinopolis: {
+        name: "Quirinópolis - GO",
+        cnpj: "62.252.910/0001-19",
+        email: "(64)99243-9047 • reidoacmquirinopolis@gmail.com"
+      }
+    };
+
+    function toCurrency(v) {
+      if (v === "" || v === null || isNaN(Number(v))) return "0,00";
+      return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updateHeader() {
+      const store = document.getElementById('store').value;
+      const data = storeData[store];
+      const headerInfo = document.getElementById('headerInfo');
+      headerInfo.innerHTML = `<strong>SOUZA E CAVALCANTE ACM E VIDRO LTDA</strong><br>CNPJ: ${data.cnpj}<br>${data.name}<br>${data.email}`;
+      document.getElementById('city').value = data.name;
+      document.getElementById('footerNote').textContent = `© 2025 REI do ACM. Todos os direitos reservados.`;
+    }
+
+    function updatePreview() {
+      document.getElementById('previewNumber').textContent = document.getElementById('receiptNumber').value || '_________';
+      document.getElementById('previewValue').textContent = toCurrency(document.getElementById('receiptValue').value || 0);
+      document.getElementById('previewPayer').textContent = document.getElementById('payerName').value || '_______________________________________';
+      document.getElementById('previewValueWords').textContent = document.getElementById('valueInWords').value || '_______________________________________';
+      document.getElementById('previewReference').textContent = document.getElementById('reference').value || '_____________________________________________';
+      document.getElementById('previewCity').textContent = document.getElementById('city').value || '_______________________________________';
+      document.getElementById('previewDateText').textContent = document.getElementById('dateText').value || '_______________________________________';
+      document.getElementById('previewSignature').textContent = document.getElementById('signature').value || '__________________________________';
+
+      document.querySelectorAll('.line').forEach(span => {
+        if (span.textContent.trim() !== '') {
+          span.classList.add('filled');
+        } else {
+          span.classList.remove('filled');
+        }
+      });
+    }
+
+    document.getElementById('store').addEventListener('change', () => { updateHeader(); updatePreview(); });
+    document.getElementById('form').addEventListener('input', updatePreview);
+
+    document.getElementById('btnReset').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('form').reset();
+      updateHeader();
+      updatePreview();
+    });
+
+    document.getElementById('btnPrint').addEventListener('click', () => {
+      const element = document.getElementById('receiptPreview');
+      const payer = (document.getElementById('payerName').value || 'Recibo').split(' ')[0];
+      const fileName = `Recibo - ${payer}.pdf`;
+      html2pdf().set({
+        margin: 10,
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(element).save();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateHeader();
+      updatePreview();
+    });
+  </script>
+</body>
+
+</html>
