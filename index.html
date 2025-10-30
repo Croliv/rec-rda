@@ -71,7 +71,7 @@
     input[type="text"],
     input[type="number"],
     select {
-      width: 100%;
+      width: 96%;
       padding: 8px;
       margin-top: 6px;
       border-radius: 6px;
@@ -276,7 +276,7 @@
       <form class="panel" id="form">
         <h2 style="margin:0 0 10px">Dados do Recibo</h2>
 
-        <label>Loja</label>
+        <label>Unidade</label>
         <select id="store">
           <option value="rioverde">Rio Verde - GO</option>
           <option value="quirinopolis">Quirinópolis - GO</option>
@@ -294,7 +294,7 @@
         <label for="cnpj">CNPJ ou CPF:</label>
         <input type="text" id="cnpj" name="cnpj" maxlength="18" placeholder="Digite o CNPJ ou CPF">
 
-        <label>Endereço do pagador</label>
+        <label>Endereço Cliente</label>
         <input type="text" id="payerAddress" placeholder="Rua, Número, Bairro, Cidade - UF">
 
 
@@ -310,8 +310,8 @@
         <label>Data (manual)</label>
         <input type="text" id="dateText" placeholder="Ex: 16 de outubro de 2025">
 
-        <label>Assinatura</label>
-        <input type="text" id="signature" placeholder="Assinatura">
+        <!--<label>Assinatura</label>
+        <input type="text" id="signature" placeholder="Assinatura">-->
       </form>
 
       <!-- PREVIEW -->
@@ -410,10 +410,25 @@
         const store = document.getElementById('store').value;
         const data = storeData[store];
         const headerInfo = document.getElementById('headerInfo');
-        headerInfo.innerHTML = `<strong>SOUZA E CAVALCANTE ACM E VIDRO LTDA</strong><br>CNPJ: ${data.cnpj}<br>${data.name}<br>${data.email}`;
-        document.getElementById('city').value = data.name;
+
+        headerInfo.innerHTML = `
+          <strong>SOUZA E CAVALCANTE ACM E VIDRO LTDA</strong><br>
+          CNPJ: ${data.cnpj}<br>
+          ${data.name}<br>
+          ${data.email}
+        `;
+
+        // Atualiza o campo "Cidade" automaticamente
+        const cityInput = document.getElementById('city');
+        cityInput.value = data.name;
+
+        // Atualiza também o texto no preview imediatamente
+        document.getElementById('previewCity').textContent = data.name;
+
+        // Atualiza o rodapé
         document.getElementById('footerNote').textContent = `© 2025 REI do ACM. Todos os direitos reservados.`;
       }
+
 
       function formatCpfCnpj(value) {
         const numeric = value.replace(/\D/g, "");
