@@ -94,8 +94,10 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      opacity: 0.55; /* antes era 0.07 */
-      width: 480px; /* ajuste menor pra caber melhor */
+      opacity: 0.55;
+      /* antes era 0.07 */
+      width: 480px;
+      /* ajuste menor pra caber melhor */
       z-index: 0;
       pointer-events: none;
     }
@@ -138,21 +140,37 @@
     }
 
     .line {
-      display: inline-block;
-      border-bottom: 1px solid transparent;
+      display: inline;
+      border-bottom: none;
       height: 22px;
       vertical-align: middle;
       margin: 0 4px;
-      padding: 0 2px;
+      padding: 0;
       white-space: nowrap;
-      transition: all .2s ease;
+      min-width: 0;
+      word-break: break-word;
     }
+
+
+    p {
+      white-space: pre-wrap;
+      /* respeita quebras de linha inseridas dinamicamente */
+      line-height: 1.8;
+    }
+
+    .preview-field.space-after {
+      margin-bottom: 30px;
+    }
+
+
 
     .line.filled {
       border-bottom-color: var(--muted);
+      border-bottom: none;
       border-radius: 3px;
       padding: 0 4px;
       width: auto;
+      font-weight: 700;
     }
 
     .bold {
@@ -167,9 +185,55 @@
       margin-top: 60px;
     }
 
+    .preview-field {
+      display: flex;
+      flex-wrap: wrap;
+      /* permite quebrar linhas se o texto for longo */
+      margin-bottom: 8px;
+      align-items: flex-start;
+    }
+
+    .preview-field .label {
+      width: 150px;
+      font-weight: 600;
+      color: #444
+    }
+
+    .preview-field .value {
+      flex: 1;
+      font-weight: 500;
+      color: #111;
+      word-break: break-word;
+    }
+
+    .signature-block {
+      text-align: center;
+      margin-top: 60px;
+      /* espaço acima do campo */
+    }
+
+    .signature-line {
+      border-bottom: 1px solid #333;
+      width: 280px;
+      margin: 0 auto 6px auto;
+      /* centraliza e separa da label */
+      height: 24px;
+      /* altura do campo (opcional) */
+      line-height: 24px;
+      font-weight: 600;
+      color: #111;
+    }
+
+    .signature-label {
+      font-size: 14px;
+      color: #444;
+    }
+
+
+
     footer.note {
-      position: absolute;
-      bottom: 20px;
+      position: relative;
+      bottom: 2px;
       left: 0;
       width: 100%;
       text-align: center;
@@ -227,6 +291,13 @@
         <label>Recebi(emos) de</label>
         <input type="text" id="payerName" placeholder="Nome do pagador">
 
+        <label>CNPJ do pagador</label>
+        <input type="text" id="payerCNPJ" placeholder="00.000.000/0000-00">
+
+        <label>Endereço do pagador</label>
+        <input type="text" id="payerAddress" placeholder="Rua, Número, Bairro, Cidade - UF">
+
+
         <label>Importância por extenso</label>
         <input type="text" id="valueInWords" placeholder="Onze mil reais">
 
@@ -266,17 +337,45 @@
             <div><span class="bold">VALOR:</span> R$ <span id="previewValue">0,00</span></div>
           </div>
 
-          <p>
-            Recebi(emos) de <span class="line" id="previewPayer"></span>,<br>
-            a importância de <span class="line" id="previewValueWords"></span>,<br>
-            referente a <span class="line" id="previewReference"></span>,<br>
-            e para clareza firmo(amos) o presente na cidade de <span class="line" id="previewCity"></span>,<br>
-            no dia <span class="line" id="previewDateText"></span>.
-          </p>
+          <div class="preview-field">
+            <span class="label">Recebi(emos) de:</span>
+            <span class="value" id="previewPayer"></span>
+          </div>
 
-          <p>
-            <span class="bold">Assinatura</span> <span class="line" id="previewSignature"></span>.
-          </p>
+          <div class="preview-field">
+            <span class="label">CNPJ:</span>
+            <span class="value" id="previewPayerCNPJ"></span>
+          </div>
+
+          <div class="preview-field">
+            <span class="label">Endereço:</span>
+            <span class="value" id="previewPayerAddress"></span>
+          </div>
+
+          <div class="preview-field">
+            <span class="label">a importância de:</span>
+            <span class="value" id="previewValueWords"></span>
+          </div>
+
+          <div class="preview-field space-after">
+            <span class="label">referente a:</span>
+            <span class="value" id="previewReference"></span>
+          </div>
+
+          <div class="preview-field">
+            <span class="label">Cidade:</span>
+            <span class="value" id="previewCity"></span>
+          </div>
+
+          <div class="preview-field">
+            <span class="label">Data:</span>
+            <span class="value" id="previewDateText"></span>
+          </div>
+
+          <div class="signature-block">
+            <div class="signature-line" id="previewSignature"></div>
+            <div class="signature-label">Assinatura</div>
+          </div>
 
           <footer class="note" id="footerNote">
             © 2025 REI do ACM. Todos os direitos reservados.
@@ -319,12 +418,15 @@
     function updatePreview() {
       document.getElementById('previewNumber').textContent = document.getElementById('receiptNumber').value || '_________';
       document.getElementById('previewValue').textContent = toCurrency(document.getElementById('receiptValue').value || 0);
+      document.getElementById('previewPayerCNPJ').textContent = document.getElementById('payerCNPJ').value || '________________';
+      document.getElementById('previewPayerAddress').textContent = document.getElementById('payerAddress').value || '_________________________________';
       document.getElementById('previewPayer').textContent = document.getElementById('payerName').value || '_______________________________________';
       document.getElementById('previewValueWords').textContent = document.getElementById('valueInWords').value || '_______________________________________';
       document.getElementById('previewReference').textContent = document.getElementById('reference').value || '_____________________________________________';
       document.getElementById('previewCity').textContent = document.getElementById('city').value || '_______________________________________';
       document.getElementById('previewDateText').textContent = document.getElementById('dateText').value || '_______________________________________';
-      document.getElementById('previewSignature').textContent = document.getElementById('signature').value || '__________________________________';
+      document.getElementById('previewSignature').textContent = document.getElementById('signature').value || '';
+
 
       document.querySelectorAll('.line').forEach(span => {
         if (span.textContent.trim() !== '') {
@@ -366,5 +468,3 @@
 </body>
 
 </html>
-
-
