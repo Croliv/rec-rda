@@ -94,11 +94,11 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      opacity: 0.55;
-      /* antes era 0.07 */
+      opacity: 0.50;
+      /* ideal para PDF */
       width: 480px;
-      /* ajuste menor pra caber melhor */
       z-index: 0;
+      /* 👈 nunca use -1 */
       pointer-events: none;
     }
 
@@ -316,155 +316,155 @@
 
       <!-- PREVIEW -->
       <div class="preview">
-        <!-- ✅ Caminho direto -->
-        <img src="marca-dagua.png" alt="marca d'água" class="watermark" id="watermarkImg">
-
         <div class="contract" id="receiptPreview">
-          <div class="header">
-            <!-- ✅ Caminho direto -->
-            <img src="logo-rda.png" alt="Logo RDA" id="logoImg">
-            <div class="info" id="headerInfo">
-              <strong>SOUZA E CAVALCANTE ACM E VIDRO LTDA</strong><br>
-              CNPJ: 62.252.910/0001-19<br>
-              Rio Verde - GO<br>
+          <img src="marca-dagua.png" alt="marca d'água" class="watermark" id="watermarkImg">
+
+          <div class="contract" id="receiptPreview">
+            <div class="header">
+              <!-- ✅ Caminho direto -->
+              <img src="logo-rda.png" alt="Logo RDA" id="logoImg">
+              <div class="info" id="headerInfo">
+                <strong>SOUZA E CAVALCANTE ACM E VIDRO LTDA</strong><br>
+                CNPJ: 62.252.910/0001-19<br>
+                Rio Verde - GO<br>
+              </div>
             </div>
+
+            <h1 class="title">RECIBO</h1>
+
+            <div style="display:flex;justify-content:space-between;">
+              <div><span class="bold">N.º</span> <span id="previewNumber">---</span></div>
+              <div><span class="bold">VALOR:</span> R$ <span id="previewValue">0,00</span></div>
+            </div>
+
+            <div class="preview-field">
+              <span class="label">Recebi(emos) de:</span>
+              <span class="value" id="previewPayer"></span>
+            </div>
+
+            <div class="preview-field">
+              <span class="label">CNPJ:</span>
+              <span class="value" id="previewPayerCNPJ"></span>
+            </div>
+
+            <div class="preview-field">
+              <span class="label">Endereço:</span>
+              <span class="value" id="previewPayerAddress"></span>
+            </div>
+
+            <div class="preview-field">
+              <span class="label">a importância de:</span>
+              <span class="value" id="previewValueWords"></span>
+            </div>
+
+            <div class="preview-field space-after">
+              <span class="label">referente a:</span>
+              <span class="value" id="previewReference"></span>
+            </div>
+
+            <div class="preview-field">
+              <span class="label">Cidade:</span>
+              <span class="value" id="previewCity"></span>
+            </div>
+
+            <div class="preview-field">
+              <span class="label">Data:</span>
+              <span class="value" id="previewDateText"></span>
+            </div>
+
+            <div class="signature-block">
+              <div class="signature-line" id="previewSignature"></div>
+              <div class="signature-label">Assinatura</div>
+            </div>
+
+            <footer class="note" id="footerNote">
+              © 2025 REI do ACM. Todos os direitos reservados.
+            </footer>
           </div>
-
-          <h1 class="title">RECIBO</h1>
-
-          <div style="display:flex;justify-content:space-between;">
-            <div><span class="bold">N.º</span> <span id="previewNumber">---</span></div>
-            <div><span class="bold">VALOR:</span> R$ <span id="previewValue">0,00</span></div>
-          </div>
-
-          <div class="preview-field">
-            <span class="label">Recebi(emos) de:</span>
-            <span class="value" id="previewPayer"></span>
-          </div>
-
-          <div class="preview-field">
-            <span class="label">CNPJ:</span>
-            <span class="value" id="previewPayerCNPJ"></span>
-          </div>
-
-          <div class="preview-field">
-            <span class="label">Endereço:</span>
-            <span class="value" id="previewPayerAddress"></span>
-          </div>
-
-          <div class="preview-field">
-            <span class="label">a importância de:</span>
-            <span class="value" id="previewValueWords"></span>
-          </div>
-
-          <div class="preview-field space-after">
-            <span class="label">referente a:</span>
-            <span class="value" id="previewReference"></span>
-          </div>
-
-          <div class="preview-field">
-            <span class="label">Cidade:</span>
-            <span class="value" id="previewCity"></span>
-          </div>
-
-          <div class="preview-field">
-            <span class="label">Data:</span>
-            <span class="value" id="previewDateText"></span>
-          </div>
-
-          <div class="signature-block">
-            <div class="signature-line" id="previewSignature"></div>
-            <div class="signature-label">Assinatura</div>
-          </div>
-
-          <footer class="note" id="footerNote">
-            © 2025 REI do ACM. Todos os direitos reservados.
-          </footer>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <script>
-    const storeData = {
-      rioverde: {
-        name: "Rio Verde - GO",
-        cnpj: "62.252.910/0001-19",
-        email: "(64)99243-9047 • reidoacmrv@gmail.com"
-      },
-      quirinopolis: {
-        name: "Quirinópolis - GO",
-        cnpj: "62.252.910/0001-19",
-        email: "(64)99243-9047 • reidoacmquirinopolis@gmail.com"
-      }
-    };
-
-    function toCurrency(v) {
-      if (v === "" || v === null || isNaN(Number(v))) return "0,00";
-      return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    function updateHeader() {
-      const store = document.getElementById('store').value;
-      const data = storeData[store];
-      const headerInfo = document.getElementById('headerInfo');
-      headerInfo.innerHTML = `<strong>SOUZA E CAVALCANTE ACM E VIDRO LTDA</strong><br>CNPJ: ${data.cnpj}<br>${data.name}<br>${data.email}`;
-      document.getElementById('city').value = data.name;
-      document.getElementById('footerNote').textContent = `© 2025 REI do ACM. Todos os direitos reservados.`;
-    }
-
-    function updatePreview() {
-      document.getElementById('previewNumber').textContent = document.getElementById('receiptNumber').value || '_________';
-      document.getElementById('previewValue').textContent = toCurrency(document.getElementById('receiptValue').value || 0);
-      document.getElementById('previewPayerCNPJ').textContent = document.getElementById('payerCNPJ').value || '________________';
-      document.getElementById('previewPayerAddress').textContent = document.getElementById('payerAddress').value || '_________________________________';
-      document.getElementById('previewPayer').textContent = document.getElementById('payerName').value || '_______________________________________';
-      document.getElementById('previewValueWords').textContent = document.getElementById('valueInWords').value || '_______________________________________';
-      document.getElementById('previewReference').textContent = document.getElementById('reference').value || '_____________________________________________';
-      document.getElementById('previewCity').textContent = document.getElementById('city').value || '_______________________________________';
-      document.getElementById('previewDateText').textContent = document.getElementById('dateText').value || '_______________________________________';
-      document.getElementById('previewSignature').textContent = document.getElementById('signature').value || '';
-
-
-      document.querySelectorAll('.line').forEach(span => {
-        if (span.textContent.trim() !== '') {
-          span.classList.add('filled');
-        } else {
-          span.classList.remove('filled');
+    <script>
+      const storeData = {
+        rioverde: {
+          name: "Rio Verde - GO",
+          cnpj: "62.252.910/0001-19",
+          email: "(64)99243-9047 • reidoacmrv@gmail.com"
+        },
+        quirinopolis: {
+          name: "Quirinópolis - GO",
+          cnpj: "62.252.910/0001-19",
+          email: "(64)99243-9047 • reidoacmquirinopolis@gmail.com"
         }
+      };
+
+      function toCurrency(v) {
+        if (v === "" || v === null || isNaN(Number(v))) return "0,00";
+        return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function updateHeader() {
+        const store = document.getElementById('store').value;
+        const data = storeData[store];
+        const headerInfo = document.getElementById('headerInfo');
+        headerInfo.innerHTML = `<strong>SOUZA E CAVALCANTE ACM E VIDRO LTDA</strong><br>CNPJ: ${data.cnpj}<br>${data.name}<br>${data.email}`;
+        document.getElementById('city').value = data.name;
+        document.getElementById('footerNote').textContent = `© 2025 REI do ACM. Todos os direitos reservados.`;
+      }
+
+      function updatePreview() {
+        document.getElementById('previewNumber').textContent = document.getElementById('receiptNumber').value || '_________';
+        document.getElementById('previewValue').textContent = toCurrency(document.getElementById('receiptValue').value || 0);
+        document.getElementById('previewPayerCNPJ').textContent = document.getElementById('payerCNPJ').value || '________________';
+        document.getElementById('previewPayerAddress').textContent = document.getElementById('payerAddress').value || '_________________________________';
+        document.getElementById('previewPayer').textContent = document.getElementById('payerName').value || '_______________________________________';
+        document.getElementById('previewValueWords').textContent = document.getElementById('valueInWords').value || '_______________________________________';
+        document.getElementById('previewReference').textContent = document.getElementById('reference').value || '_____________________________________________';
+        document.getElementById('previewCity').textContent = document.getElementById('city').value || '_______________________________________';
+        document.getElementById('previewDateText').textContent = document.getElementById('dateText').value || '_______________________________________';
+        document.getElementById('previewSignature').textContent = document.getElementById('signature').value || '';
+
+
+        document.querySelectorAll('.line').forEach(span => {
+          if (span.textContent.trim() !== '') {
+            span.classList.add('filled');
+          } else {
+            span.classList.remove('filled');
+          }
+        });
+      }
+
+      document.getElementById('store').addEventListener('change', () => { updateHeader(); updatePreview(); });
+      document.getElementById('form').addEventListener('input', updatePreview);
+
+      document.getElementById('btnReset').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('form').reset();
+        updateHeader();
+        updatePreview();
       });
-    }
 
-    document.getElementById('store').addEventListener('change', () => { updateHeader(); updatePreview(); });
-    document.getElementById('form').addEventListener('input', updatePreview);
+      document.getElementById('btnPrint').addEventListener('click', () => {
+        const element = document.getElementById('receiptPreview');
+        const payer = (document.getElementById('payerName').value || 'Recibo').split(' ')[0];
+        const fileName = `Recibo - ${payer}.pdf`;
+        html2pdf().set({
+          margin: 10,
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).from(element).save();
+      });
 
-    document.getElementById('btnReset').addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('form').reset();
-      updateHeader();
-      updatePreview();
-    });
-
-    document.getElementById('btnPrint').addEventListener('click', () => {
-      const element = document.getElementById('receiptPreview');
-      const payer = (document.getElementById('payerName').value || 'Recibo').split(' ')[0];
-      const fileName = `Recibo - ${payer}.pdf`;
-      html2pdf().set({
-        margin: 10,
-        filename: fileName,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }).from(element).save();
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      updateHeader();
-      updatePreview();
-    });
-  </script>
+      document.addEventListener('DOMContentLoaded', () => {
+        updateHeader();
+        updatePreview();
+      });
+    </script>
 </body>
 
 </html>
