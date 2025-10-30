@@ -291,8 +291,8 @@
         <label>Recebi(emos) de</label>
         <input type="text" id="payerName" placeholder="Nome do pagador">
 
-        <label>CNPJ do pagador</label>
-        <input type="text" id="payerCNPJ" placeholder="00.000.000/0000-00">
+        <label for="cnpj">CNPJ ou CPF:</label>
+        <input type="text" id="cnpj" name="cnpj" maxlength="18" placeholder="Digite o CNPJ ou CPF">
 
         <label>Endereço do pagador</label>
         <input type="text" id="payerAddress" placeholder="Rua, Número, Bairro, Cidade - UF">
@@ -342,9 +342,9 @@
               <span class="value" id="previewPayer"></span>
             </div>
 
-            <div class="preview-field">
-              <span class="label">CNPJ:</span>
-              <span class="value" id="previewPayerCNPJ"></span>
+            <div class="preview-field" id="previewCnpjField" style="display:none;">
+              <span class="label" id="previewCnpjLabel"></span>
+              <span class="value" id="previewCnpjValue"></span>
             </div>
 
             <div class="preview-field">
@@ -415,18 +415,49 @@
         document.getElementById('footerNote').textContent = `© 2025 REI do ACM. Todos os direitos reservados.`;
       }
 
+      function formatCpfCnpj(value) {
+        const numeric = value.replace(/\D/g, "");
+        if (numeric.length === 11) {
+          return {
+            type: "CPF",
+            formatted: numeric.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")
+          };
+        } else if (numeric.length === 14) {
+          return {
+            type: "CNPJ",
+            formatted: numeric.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")
+          };
+        } else {
+          return null;
+        }
+      }
+
       function updatePreview() {
         document.getElementById('previewNumber').textContent = document.getElementById('receiptNumber').value || '_________';
         document.getElementById('previewValue').textContent = toCurrency(document.getElementById('receiptValue').value || 0);
-        document.getElementById('previewPayerCNPJ').textContent = document.getElementById('payerCNPJ').value || '________________';
-        document.getElementById('previewPayerAddress').textContent = document.getElementById('payerAddress').value || '_________________________________';
-        document.getElementById('previewPayer').textContent = document.getElementById('payerName').value || '_______________________________________';
-        document.getElementById('previewValueWords').textContent = document.getElementById('valueInWords').value || '_______________________________________';
-        document.getElementById('previewReference').textContent = document.getElementById('reference').value || '_____________________________________________';
-        document.getElementById('previewCity').textContent = document.getElementById('city').value || '_______________________________________';
-        document.getElementById('previewDateText').textContent = document.getElementById('dateText').value || '_______________________________________';
+        document.getElementById('previewPayerAddress').textContent = document.getElementById('payerAddress').value || '____________________________________________';
+        document.getElementById('previewPayer').textContent = document.getElementById('payerName').value || '____________________________________________';
+        document.getElementById('previewValueWords').textContent = document.getElementById('valueInWords').value || '____________________________________________';
+        document.getElementById('previewReference').textContent = document.getElementById('reference').value || '____________________________________________';
+        document.getElementById('previewCity').textContent = document.getElementById('city').value || '____________________________________________';
+        document.getElementById('previewDateText').textContent = document.getElementById('dateText').value || '____________________________________________';
         document.getElementById('previewSignature').textContent = document.getElementById('signature').value || '';
 
+        // 🔸 CNPJ / CPF dinâmico
+        const cnpjInput = document.getElementById("cnpj").value.replace(/\D/g, "").trim();
+        const cnpjField = document.getElementById("previewCnpjField");
+        const cnpjLabel = document.getElementById("previewCnpjLabel");
+        const cnpjValue = document.getElementById("previewCnpjValue");
+
+        const formatted = formatCpfCnpj(cnpjInput);
+
+        if (formatted) {
+          cnpjLabel.textContent = `${formatted.type}:`;
+          cnpjValue.textContent = formatted.formatted;
+          cnpjField.style.display = "flex";
+        } else {
+          cnpjField.style.display = "none";
+        }
 
         document.querySelectorAll('.line').forEach(span => {
           if (span.textContent.trim() !== '') {
@@ -436,6 +467,7 @@
           }
         });
       }
+
 
       document.getElementById('store').addEventListener('change', () => { updateHeader(); updatePreview(); });
       document.getElementById('form').addEventListener('input', updatePreview);
