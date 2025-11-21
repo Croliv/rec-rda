@@ -456,23 +456,23 @@
         document.getElementById('previewReference').textContent = document.getElementById('reference').value || '____________________________________________';
         document.getElementById('previewCity').textContent = document.getElementById('city').value || '____________________________________________';
         document.getElementById('previewDateText').textContent = document.getElementById('dateText').value || '____________________________________________';
-        document.getElementById('previewSignature').textContent = document.getElementById('signature').value || '';
+        document.getElementById('previewSignature').textContent = '';
 
-        // 🔸 CNPJ / CPF dinâmico
-        const cnpjInput = document.getElementById("cnpj").value.replace(/\D/g, "").trim();
+
+        // 🔸 CNPJ / CPF sempre visível, mesmo incompleto
+        const cnpjText = document.getElementById("cnpj").value;
         const cnpjField = document.getElementById("previewCnpjField");
         const cnpjLabel = document.getElementById("previewCnpjLabel");
         const cnpjValue = document.getElementById("previewCnpjValue");
 
-        const formatted = formatCpfCnpj(cnpjInput);
-
-        if (formatted) {
-          cnpjLabel.textContent = `${formatted.type}:`;
-          cnpjValue.textContent = formatted.formatted;
+        if (cnpjText.trim().length > 0) {
+          cnpjLabel.textContent = "CPF/CNPJ:";
+          cnpjValue.textContent = cnpjText;
           cnpjField.style.display = "flex";
         } else {
           cnpjField.style.display = "none";
         }
+
 
         document.querySelectorAll('.line').forEach(span => {
           if (span.textContent.trim() !== '') {
